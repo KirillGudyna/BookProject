@@ -12,11 +12,10 @@ import java.util.stream.Collectors;
 public class BookListDAOImpl implements BookListDao {
     private final BookWarehouse bookWarehouse;
     public BookListDAOImpl() {
-        bookWarehouse= new BookWarehouse();
-
+        bookWarehouse=BookWarehouse.getInstance();
     }
     @Override
-    public void addBook(Book book) throws DAOException {
+    public boolean addBook(Book book) throws DAOException {
         List<Book> books = bookWarehouse.findAll();
         if (books.contains(book)) {
             throw new DAOException("This book already exists!");
@@ -24,16 +23,16 @@ public class BookListDAOImpl implements BookListDao {
         if (bookWarehouse.isFull()) {
             throw new DAOException("Warehouse is full!");
         }
-        bookWarehouse.add(book);
+        return bookWarehouse.add(book);
     }
 
     @Override
-    public void removeBook(Book book) throws DAOException {
+    public boolean removeBook(Book book) throws DAOException {
         List<Book> books = bookWarehouse.findAll();
-        if (books.contains(book)) {
-            throw new DAOException("This book already exists!");
+        if (!books.contains(book)) {
+            throw new DAOException("This book doesn't exists!");
         }
-        bookWarehouse.remove(book);
+        return bookWarehouse.remove(book);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class BookListDAOImpl implements BookListDao {
     public List<Book> sortBooksByName() {
         List<Book> books = bookWarehouse.findAll();
         List<Book> sortedList;
-        sortedList = books.stream().sorted((o1, o2) -> o1.getName().compareTo(o2.getName())).collect(Collectors.toList());
+        sortedList = books.stream().sorted(Comparator.comparing(Book::getName)).collect(Collectors.toList());
         return sortedList;
     }
 
@@ -91,7 +90,7 @@ public class BookListDAOImpl implements BookListDao {
     public List<Book> sortBooksByPrice() {
         List<Book> books = bookWarehouse.findAll();
         List<Book> sortedList;
-        sortedList = books.stream().sorted((o1, o2) -> (int) (o1.getPrice()-o2.getPrice())).collect(Collectors.toList());
+        sortedList = books.stream().sorted(Comparator.comparingDouble(Book::getPrice)).collect(Collectors.toList());
         return sortedList;
     }
 
@@ -99,7 +98,7 @@ public class BookListDAOImpl implements BookListDao {
     public List<Book> sortBooksByYear() {
         List<Book> books = bookWarehouse.findAll();
         List<Book> sortedList;
-        sortedList = books.stream().sorted((o1, o2) -> o1.getYearCreation()-o2.getYearCreation()).collect(Collectors.toList());
+        sortedList = books.stream().sorted(Comparator.comparingInt(Book::getYearCreation)).collect(Collectors.toList());
         return sortedList;
     }
 
@@ -107,7 +106,7 @@ public class BookListDAOImpl implements BookListDao {
     public List<Book> sortBooksByPages() {
         List<Book> books = bookWarehouse.findAll();
         List<Book> sortedList;
-        sortedList = books.stream().sorted((o1, o2) -> o1.getCountPages()-o2.getCountPages()).collect(Collectors.toList());
+        sortedList = books.stream().sorted(Comparator.comparingInt(Book::getCountPages)).collect(Collectors.toList());
         return sortedList;
     }
 }

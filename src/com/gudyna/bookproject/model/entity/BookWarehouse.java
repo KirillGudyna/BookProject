@@ -8,9 +8,16 @@ public class BookWarehouse {
 
     private List<Book> books;
     private static final int CAPACITY = 30;
-
-    public BookWarehouse() {
+    private static BookWarehouse bookWarehouseInstance;
+    private BookWarehouse() {
         books = new ArrayList<>();
+    }
+
+    public static BookWarehouse getInstance() {
+        if (bookWarehouseInstance == null) {
+            bookWarehouseInstance = new BookWarehouse();
+        }
+        return bookWarehouseInstance;
     }
 
     public boolean add(Book book) {

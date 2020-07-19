@@ -46,7 +46,46 @@ public class Book {
     public void setPrice(double price) {
         this.price = price;
     }
+    public BuilderBook createBuilder(){
+        return new Book().new BuilderBook();
+    }
+    public class BuilderBook{
+        private BuilderBook() {
+            Book.this.id = "";
+            Book.this.name = "";
+            Book.this.yearCreation =0;
+            Book.this.price=0.0;
+            Book.this.countPages = 0;
+        }
+        public BuilderBook setId(String id) {
+            Book.this.id = id;
+            return this;
+        }
 
+        public BuilderBook setName(String name) {
+            Book.this.name = name;
+            return this;
+        }
+
+        public BuilderBook setPrice(double price) {
+            Book.this.price = price;
+            return this;
+        }
+
+        public BuilderBook setYear(int year) {
+            Book.this.yearCreation = year;
+            return this;
+        }
+
+        public BuilderBook setPages(int pages) {
+            Book.this.countPages = pages;
+            return this;
+        }
+
+        public Book build() {
+            return Book.this;
+        }
+    }
     @Override
     public boolean equals(Object o) {
         if(o==null){

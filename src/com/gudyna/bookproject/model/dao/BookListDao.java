@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface BookListDao {
 
-    void addBook(Book book) throws DAOException;
+    boolean addBook(Book book) throws DAOException;
 
-    void removeBook(Book book) throws DAOException;
+    boolean removeBook(Book book) throws DAOException;
 
     List<Book> findBookById(String id);
 
