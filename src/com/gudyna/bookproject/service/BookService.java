@@ -25,7 +25,7 @@ public class BookService {
                 .setName(tagsBook[1])
                 .setYear(Integer.parseInt(tagsBook[2]))
                 .setPages(Integer.parseInt(tagsBook[3]))
-                .setPrice(Double.parseDouble(tagsBook[4]))
+                .setPrice(Integer.parseInt(tagsBook[4]))
                 .build();
         return book;
     }

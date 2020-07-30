@@ -5,7 +5,7 @@ public class Book {
     private String name;
     private int yearCreation;
     private int countPages;
-    private double price;
+    private int price;
 
     public String getId() {
         return id;
@@ -39,11 +39,11 @@ public class Book {
         this.countPages = countPages;
     }
 
-    public double getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(int price) {
         this.price = price;
     }
     public BuilderBook createBuilder(){
@@ -54,7 +54,7 @@ public class Book {
             Book.this.id = "";
             Book.this.name = "";
             Book.this.yearCreation =0;
-            Book.this.price=0.0;
+            Book.this.price=0;
             Book.this.countPages = 0;
         }
         public BuilderBook setId(String id) {
@@ -67,7 +67,7 @@ public class Book {
             return this;
         }
 
-        public BuilderBook setPrice(double price) {
+        public BuilderBook setPrice(int price) {
             Book.this.price = price;
             return this;
         }

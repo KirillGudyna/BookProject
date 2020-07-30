@@ -9,7 +9,7 @@ public interface BookListDao {
 
     boolean addBook(Book book) throws DAOException;
 
-    boolean removeBook(Book book) throws DAOException;
+    List<Book> removeBook(Book book) throws DAOException;
 
     List<Book> findBookById(String id);
 

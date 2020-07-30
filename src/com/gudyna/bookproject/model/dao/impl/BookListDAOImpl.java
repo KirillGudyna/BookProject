@@ -4,10 +4,19 @@ import com.gudyna.bookproject.model.dao.BookListDao;
 import com.gudyna.bookproject.model.entity.Book;
 import com.gudyna.bookproject.model.entity.BookWarehouse;
 import com.gudyna.bookproject.model.exception.DAOException;
+import com.gudyna.bookproject.model.sqlconnect.BaseHelper;
+import com.gudyna.bookproject.model.sqlconnect.SqlConnector;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+
 
 public class BookListDAOImpl implements BookListDao {
     private final BookWarehouse bookWarehouse;
@@ -16,23 +25,42 @@ public class BookListDAOImpl implements BookListDao {
     }
     @Override
     public boolean addBook(Book book) throws DAOException {
-        List<Book> books = bookWarehouse.findAll();
-        if (books.contains(book)) {
-            throw new DAOException("This book already exists!");
+        BaseHelper baseHelper = new BaseHelper();
+        ResultSet resultSet = null;
+        try(Connection connection = SqlConnector.connect();
+            PreparedStatement statementAdd =
+                    baseHelper.prepareStatementAdd(connection, book);
+        PreparedStatement statementSelect =
+                baseHelper.prepareStatementSelect(connection, book)) {
+            statementAdd.executeUpdate();
+            resultSet = statementSelect.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e){
+            throw  new DAOException(e);
+        } finally{
+            close(resultSet);
         }
-        if (bookWarehouse.isFull()) {
-            throw new DAOException("Warehouse is full!");
-        }
-        return bookWarehouse.add(book);
     }
 
     @Override
-    public boolean removeBook(Book book) throws DAOException {
-        List<Book> books = bookWarehouse.findAll();
-        if (!books.contains(book)) {
-            throw new DAOException("This book doesn't exists!");
+    public List<Book> removeBook(Book book) throws DAOException {
+        BaseHelper helper = new BaseHelper();
+        List<Book> removedBooks = new ArrayList<>();
+        try (Connection connection = SqlConnector.connect();
+             PreparedStatement statementSelect =
+                     helper.prepareStatementSelect(connection, book);
+             ResultSet resultSet = statementSelect.executeQuery()) {
+            while (resultSet.next()) {
+                removedBooks.add(book);
+                resultSet.deleteRow();
+            }
+            if (removedBooks.isEmpty()) {
+                throw new DAOException("There is no such book in warehouse!");
+            }
+        } catch (SQLException e) {
+            throw new DAOException(e);
         }
-        return bookWarehouse.remove(book);
+        return removedBooks;
     }
 
     @Override
@@ -108,5 +136,14 @@ public class BookListDAOImpl implements BookListDao {
         List<Book> sortedList;
         sortedList = books.stream().sorted(Comparator.comparingInt(Book::getCountPages)).collect(Collectors.toList());
         return sortedList;
+    }
+    void close(ResultSet resultSet) throws DAOException {
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException e) {
+                throw new DAOException("Error during closing result set!");
+            }
+        }
     }
 }
